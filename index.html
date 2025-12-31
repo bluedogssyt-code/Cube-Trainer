@@ -1,1 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rubik's Cube Trainer</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #ececec; color: #333; }
+  h1 { text-align: center; color: #2c3e50; }
+  .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  #algList { margin-top: 20px; }
+  .algItem { background: #f9f9f9; padding: 15px; margin-bottom: 8px; border-left: 5px solid #3498db; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .case-name { font-weight: bold; color: #2980b9; flex: 1; }
+  .alg-code { font-family: 'Courier New', Courier, monospace; background: #eee; padding: 5px 10px; border-radius: 3px; flex: 2; text-align: right; }
+  .controls { text-align: center; margin-bottom: 20px; }
+  select, button { padding: 10px 15px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; outline: none; }
+  button { background-color: #3498db; color: white; border: none; cursor: pointer; transition: background 0.3s; }
+  button:hover { background-color: #2980b9; }
+</style>
+</head>
+<body>
 
+<div class="container">
+  <h1>Rubik's Cube Trainer</h1>
+
+  <div class="controls">
+    <select id="methodSelect">
+      <option value="all">All Methods</option>
+      <option value="Roux_CMLL">Roux CMLL</option>
+      <option value="ZBLL_U_Set">ZBLL U Set</option>
+    </select>
+    <button onclick="showRandom()">Random Algorithm</button>
+  </div>
+
+  <div id="algList"></div>
+</div>
+
+<script>
+let algs = {};
+
+async function loadAlgs() {
+  const response = await fetch('algs.json');
+  algs = await response.json();
+  showAlgorithms();
+}
+
+const algListDiv = document.getElementById("algList");
+const methodSelect = document.getElementById("methodSelect");
+
+function showAlgorithms() {
+  const method = methodSelect.value;
+  algListDiv.innerHTML = "";
+  let items = [];
+  if (method === "all") {
+    for (const key in algs) items = items.concat(algs[key]);
+  } else {
+    items = algs[method] || [];
+  }
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "algItem";
+    div.innerHTML = `<span class="case-name">${item.case}</span><span class="alg-code">${item.alg}</span>`;
+    algListDiv.appendChild(div);
+  });
+}
+
+function showRandom() {
+  const method = methodSelect.value;
+  let items = [];
+  if (method === "all") {
+    for (const key in algs) items = items.concat(algs[key]);
+  } else {
+    items = algs[method] || [];
+  }
+  if (items.length === 0) return;
+  const rand = items[Math.floor(Math.random() * items.length)];
+  alert(`Random Case Practice:\n\n${rand.case}\nAlgorithm: ${rand.alg}`);
+}
+
+methodSelect.addEventListener("change", showAlgorithms);
+
+loadAlgs();
+</script>
+
+</body>
+</html>
